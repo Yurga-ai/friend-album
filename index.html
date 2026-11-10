@@ -88,6 +88,33 @@
             margin-top: -3px;
         }
 
+        /* Блок управляющих кнопок (музыка + ютуб) */
+        .media-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .media-btn {
+            background: var(--primary);
+            color: #1e272e;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(212,175,55,0.4);
+            transition: all 0.3s ease;
+        }
+
+        .media-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
         /* Кнопки категорий */
         .buttons-grid {
             display: grid;
@@ -179,6 +206,27 @@
             gap: 15px;
         }
 
+        /* Стиль адаптивного видеоконтейнера */
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* Соотношение сторон 16:9 */
+            height: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 12px;
+        }
+
         /* Стиль фоторамки */
         .photo-frame {
             background: #fff;
@@ -241,14 +289,17 @@
             <span class="chains-bottom">⛓️ 🔗 ⛓️</span>
         </h1>
         
-        <!-- Блок музыкального плеера -->
-        <div style="text-align: center; margin: 15px 0;">
+        <!-- Блок медиа-кнопок (Музыка + YouTube) -->
+        <div class="media-controls">
             <audio id="bg-audio" loop>
                 <source src="Max Schultz - The Howler.mp3" type="audio/mpeg">
                 Ваш браузер не поддерживает аудио.
             </audio>
-            <button onclick="toggleAudio()" id="audio-btn" style="background: var(--primary); color: #1e272e; border: none; padding: 10px 20px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(212,175,55,0.4);">
+            <button onclick="toggleAudio()" id="audio-btn" class="media-btn">
                 ▶ Зацени трек
+            </button>
+            <button onclick="showYouTube()" class="media-btn">
+                🎬 Ганста Видос
             </button>
         </div>
 
@@ -277,7 +328,7 @@
             <button class="age-btn" onclick="showGallery(5)">Милота <span>По братски</span></button>
         </div>
 
-        <!-- Контейнер для фотографий -->
+        <!-- Контейнер для фотографий и видео -->
         <div id="gallery-container">
             <div class="welcome-text">Тапай на кнопки - мы в одной лодке 📸</div>
         </div>
@@ -365,6 +416,26 @@
             });
 
             html += `
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Функция для вывода YouTube плеера в блоке галереи
+        function showYouTube() {
+            // Снимаем подсветку с кнопок категорий
+            const buttons = document.querySelectorAll('.age-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            const container = document.getElementById('gallery-container');
+            
+            let html = `
+                <div class="gallery-card visible">
+                    <div class="gallery-title">Эксклюзивный движ с Ютуба</div>
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/XP4XjVwKVHQ?list=RDXP4XjVwKVHQ&autoplay=1" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                     </div>
                 </div>
             `;
