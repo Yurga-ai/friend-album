@@ -77,7 +77,7 @@
             margin-top: -3px;
         }
 
-        /* Блок медиа-плеера и плейлиста */
+        /* Блок медиа-плеера */
         .player-box {
             background: var(--card-bg);
             border: 1px solid rgba(212, 175, 55, 0.3);
@@ -92,16 +92,15 @@
             justify-content: center;
             gap: 10px;
             flex-wrap: wrap;
-            margin-bottom: 10px;
         }
 
         .media-btn {
             background: var(--primary);
             color: #1e272e;
             border: none;
-            padding: 8px 16px;
+            padding: 10px 20px;
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(212,175,55,0.4);
@@ -117,7 +116,7 @@
             font-size: 0.85rem;
             color: #dcdde1;
             font-style: italic;
-            margin-top: 5px;
+            margin-top: 10px;
         }
 
         /* Кнопки категорий */
@@ -290,18 +289,19 @@
         <h1 class="gangsta-title">
             <span class="chains-top">⛓️ 🔗 ⛓️</span>
             <span class="main-text">ЛУЧШИЙ KENT</span>
+            <span class="gangsta-title sub-text" style="font-size: 0.85rem; font-family: 'Segoe UI', sans-serif; font-weight: bold; color: #dcdde1; letter-spacing: 3px; margin-top: 5px;">Братство, лояльность, успех</span>
             <span class="chains-bottom">⛓️ 🔗 ⛓️</span>
         </h1>
         
-        <!-- Плеер с плейлистом и автозапуском -->
+        <!-- Плеер -->
         <div class="player-box">
-            <audio id="bg-audio" autoplay></audio>
-            <div class="media-controls">
-                <button onclick="toggleAudio()" id="audio-btn" class="media-btn">⏸ Пауза</button>
-                <button onclick="nextTrack()" class="media-btn">⏭ Следующий трек</button>
+            <audio id="bg-audio"></audio>
+            <div id="controls-container" class="media-controls">
+                <!-- Изначально показываем только кнопку "Зацени трек" -->
+                <button onclick="playMusic()" class="media-btn">▶ Зацени трек</button>
                 <button onclick="showYouTube()" class="media-btn">🎬 Ганста Видос</button>
             </div>
-            <div id="track-info" class="current-track-info">Играет: Загрузка трека...</div>
+            <div id="track-info" class="current-track-info" style="display: none;"></div>
         </div>
 
         <!-- Кнопки категорий для кента -->
@@ -321,71 +321,65 @@
     </div>
 
     <script>
-        // Плейлист треков (можете добавлять свои файлы внутрь массива)
+        // Плейлист из двух треков
         const playlist = [
-            { src: "Snoop Dog feat. Dr. Dre - The Next Episode.mp3", title: "Snoop Dog feat. Dr. Dre - The Next Episode" },
-            // Сюда можно добавить еще треки по примеру:
-            // { src: "track2.mp3", title: "Название второго трека" }
+            { src: "Snoop Dog feat. Dr. Dre - The Next Episode.mp3", title: "Snoop Dogg feat. Dr. Dre - The Next Episode" },
+            { src: "Dr. Dre Feat. Snoop Dogg - Still D.R.E..mp3", title: "Dr. Dre Feat. Snoop Dogg - Still D.R.E." }
         ];
 
         let currentTrackIndex = 0;
         const audio = document.getElementById('bg-audio');
+        const controlsContainer = document.getElementById('controls-container');
         const trackInfo = document.getElementById('track-info');
-        const audioBtn = document.getElementById('audio-btn');
 
-        // Инициализация плеера и автозапуска
-        function initPlayer() {
-            if (playlist.length === 0) return;
+        // Первичное нажатие "Зацени трек"
+        function playMusic() {
             audio.src = playlist[currentTrackIndex].src;
-            trackInfo.textContent = `Играет: ${playlist[currentTrackIndex].title}`;
-            
-            // Пытаемся запустить автовоспроизведение
             audio.play().then(() => {
-                audioBtn.textContent = '⏸ Пауза';
-            }).catch(error => {
-                // Если браузер заблокировал автозапуск, ждем первого клика пользователя на сайте
-                audioBtn.textContent = '▶ Включить музыку';
-                trackInfo.textContent = `Нажми «Включить музыку», чтобы запустить трек`;
-                
-                const unlockAudio = () => {
-                    audio.play();
-                    audioBtn.textContent = '⏸ Пауза';
-                    trackInfo.textContent = `Играет: ${playlist[currentTrackIndex].title}`;
-                    document.removeEventListener('click', unlockAudio);
-                };
-                document.addEventListener('click', unlockAudio, { once: true });
+                updateActiveControls();
+            }).catch(e => {
+                console.log("Playback blocked", e);
             });
         }
 
-        // Кнопка Play / Pause
-        function toggleAudio() {
-            if (audio.paused) {
-                audio.play();
-                audioBtn.textContent = '⏸ Пауза';
-                trackInfo.textContent = `Играет: ${playlist[currentTrackIndex].title}`;
-            } else {
-                audio.pause();
-                audioBtn.textContent = '▶ Включить музыку';
-                trackInfo.textContent = 'Музыка на паузе';
-            }
+        // Кнопка Пауза (возвращает сайт в изначальное состояние)
+        function pauseMusic() {
+            audio.pause();
+            trackInfo.style.display = 'none';
+            trackInfo.textContent = '';
+            
+            // Сбрасываем панель на изначальный вид: только кнопка "Зацени трек" и видео
+            controlsContainer.innerHTML = `
+                <button onclick="playMusic()" class="media-btn">▶ Зацени трек</button>
+                <button onclick="showYouTube()" class="media-btn">🎬 Ганста Видос</button>
+            `;
         }
 
-        // Переключение на следующий трек в плейлисте
+        // Переключение на следующий трек
         function nextTrack() {
             currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
             audio.src = playlist[currentTrackIndex].src;
             audio.play();
-            audioBtn.textContent = '⏸ Пауза';
-            trackInfo.textContent = `Играет: ${playlist[currentTrackIndex].title}`;
+            updateActiveControls();
         }
 
-        // Автоматический переход к следующему треку по окончании текущего
+        // Обновление интерфейса панели при играющей музыке
+        function updateActiveControls() {
+            trackInfo.style.display = 'block';
+            trackInfo.textContent = `Играет: ${playlist[currentTrackIndex].title}`;
+            
+            // Появляются кнопки "Пауза", "Следующий трек" и "Ганста Видос"
+            controlsContainer.innerHTML = `
+                <button onclick="pauseMusic()" class="media-btn">⏸ Пауза</button>
+                <button onclick="nextTrack()" class="media-btn">⏭ Следующий трек</button>
+                <button onclick="showYouTube()" class="media-btn">🎬 Ганста Видос</button>
+            `;
+        }
+
+        // Автоматический переход к следующему треку по окончании
         audio.addEventListener('ended', () => {
             nextTrack();
         });
-
-        // Запуск плеера при загрузке страницы
-        window.addEventListener('DOMContentLoaded', initPlayer);
 
         // Данные галереи фотографий кента
         const photoData = {
