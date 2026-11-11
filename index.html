@@ -346,7 +346,6 @@
             trackInfo.style.display = 'none';
             trackInfo.textContent = '';
             
-            // Сбрасываем панель на изначальный вид: только кнопка "Зацени трек" и видео
             controlsContainer.innerHTML = `
                 <button onclick="playMusic()" class="media-btn">▶ Зацени трек</button>
                 <button onclick="showYouTube()" class="media-btn">🎬 Ганста Видос</button>
@@ -366,7 +365,6 @@
             trackInfo.style.display = 'block';
             trackInfo.textContent = `Играет: ${playlist[currentTrackIndex].title}`;
             
-            // Появляются кнопки "Пауза", "Следующий трек" и "Ганста Видос"
             controlsContainer.innerHTML = `
                 <button onclick="pauseMusic()" class="media-btn">⏸ Пауза</button>
                 <button onclick="nextTrack()" class="media-btn">⏭ Следующий трек</button>
@@ -467,8 +465,18 @@
             container.innerHTML = html;
         }
 
-        // Функция для вывода YouTube плеера в блоке галереи
+        // Функция для вывода YouTube плеера (при этом музыка останавливается и плеер сбрасывается)
         function showYouTube() {
+            // Останавливаем музыку и сбрасываем плеер в исходное состояние
+            audio.pause();
+            trackInfo.style.display = 'none';
+            trackInfo.textContent = '';
+            controlsContainer.innerHTML = `
+                <button onclick="playMusic()" class="media-btn">▶ Зацени трек</button>
+                <button onclick="showYouTube()" class="media-btn">🎬 Ганста Видос</button>
+            `;
+
+            // Снимаем подсветку с кнопок категорий фото
             const buttons = document.querySelectorAll('.age-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
 
